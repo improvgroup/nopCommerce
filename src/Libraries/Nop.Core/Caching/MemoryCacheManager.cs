@@ -84,7 +84,7 @@ namespace Nop.Core.Caching
             });
 
             //do not cache null value
-            if (result == null)
+            if (result is null)
                 Remove(key);
 
             return result;
@@ -119,7 +119,7 @@ namespace Nop.Core.Caching
              });
 
             //do not cache null value
-            if (result == null)
+            if (result is null)
                 Remove(key);
 
             return result;
@@ -132,7 +132,7 @@ namespace Nop.Core.Caching
         /// <param name="data">Value for caching</param>
         public void Set(CacheKey key, object data)
         {
-            if (key.CacheTime <= 0 || data == null)
+            if (key.CacheTime <= 0 || data is null)
                 return;
 
             _memoryCache.Set(key.Key, data, PrepareEntryOptions(key));

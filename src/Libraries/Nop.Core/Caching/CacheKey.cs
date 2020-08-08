@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Nop.Core.Caching
+﻿namespace Nop.Core.Caching
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public partial class CacheKey
     {
-        #region Fields
-
-        protected string _keyFormat = "";
-
-        #endregion
-
-        #region Ctor
+        protected string _keyFormat = string.Empty;
 
         public CacheKey(CacheKey cacheKey, Func<object, object> createCacheKeyParameters, params object[] keyObjects)
         {
-            Init(cacheKey.Key, cacheKey.CacheTime, cacheKey.Prefixes.ToArray());
+            Key = cacheKey.Key;
 
-            if(!keyObjects.Any())
+            _keyFormat = cacheKey.Key;
+
+            CacheTime = cacheKey.CacheTime;
+
+            Prefixes.AddRange(cacheKey.Prefixes.Where(prefix => !string.IsNullOrEmpty(prefix)));
+
+            if (!keyObjects.Any())
                 return;
 
             Key = string.Format(_keyFormat, keyObjects.Select(createCacheKeyParameters).ToArray());
@@ -29,26 +29,6 @@ namespace Nop.Core.Caching
 
         public CacheKey(string cacheKey, int? cacheTime = null, params string[] prefixes)
         {
-            Init(cacheKey, cacheTime, prefixes);
-        }
-
-        public CacheKey(string cacheKey, params string[] prefixes)
-        {
-            Init(cacheKey, null, prefixes);
-        }
-
-        #endregion
-
-        #region Utilities
-
-        /// <summary>
-        /// Init instance of CacheKey
-        /// </summary>
-        /// <param name="cacheKey">Cache key</param>
-        /// <param name="cacheTime">Cache time; set to null to use the default value</param>
-        /// <param name="prefixes">Prefixes to remove by prefix functionality</param>
-        protected void Init(string cacheKey, int? cacheTime = null, params string[] prefixes)
-        {
             Key = cacheKey;
 
             _keyFormat = cacheKey;
@@ -56,10 +36,22 @@ namespace Nop.Core.Caching
             if (cacheTime.HasValue)
                 CacheTime = cacheTime.Value;
 
-            Prefixes.AddRange(prefixes.Where(prefix=> !string.IsNullOrEmpty(prefix)));
+            Prefixes.AddRange(prefixes.Where(prefix => !string.IsNullOrEmpty(prefix)));
         }
 
-        #endregion
+        public CacheKey(string cacheKey, params string[] prefixes)
+        {
+            Key = cacheKey;
+
+            _keyFormat = cacheKey;
+
+            Prefixes.AddRange(prefixes.Where(prefix => !string.IsNullOrEmpty(prefix)));
+        }
+
+        /// <summary>
+        /// Cache time in minutes
+        /// </summary>
+        public int CacheTime { get; set; } = NopCachingDefaults.CacheTime;
 
         /// <summary>
         /// Cache key
@@ -70,10 +62,5 @@ namespace Nop.Core.Caching
         /// Prefixes to remove by prefix functionality
         /// </summary>
         public List<string> Prefixes { get; protected set; } = new List<string>();
-
-        /// <summary>
-        /// Cache time in minutes
-        /// </summary>
-        public int CacheTime { get; set; } = NopCachingDefaults.CacheTime;
     }
 }

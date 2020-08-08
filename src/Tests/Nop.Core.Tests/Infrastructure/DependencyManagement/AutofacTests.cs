@@ -29,11 +29,11 @@ namespace Nop.Core.Tests.Infrastructure.DependencyManagement
                 scopeBuilder => scopeBuilder.RegisterType<Foo3>().As<IFoo>());
             var arrayB = scopeB.Resolve<IEnumerable<IFoo>>().ToArray();
 
-            arrayA.Count().Should().Be(2);
+            arrayA.Length.Should().Be(2);
             arrayA.Should().Contain(x => x is Foo1);
             arrayA.Should().Contain(x => x is Foo2);
 
-            arrayB.Count().Should().Be(2);
+            arrayB.Length.Should().Be(2);
             arrayB.Should().Contain(x => x is Foo1);
             arrayB.Should().Contain(x => x is Foo3);
         }

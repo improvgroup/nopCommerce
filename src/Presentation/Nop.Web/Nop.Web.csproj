@@ -16,6 +16,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <!--When true, compiles and emits the Razor assembly as part of publishing the project-->
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,11 +37,11 @@
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\**;Themes\**" />
 
-    <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest"/>
-    <None Include="Plugins\**"  CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="Plugins\**" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\**" CopyToPublishDirectory="PreserveNewest" Exclude="Themes\**\*.config;Themes\**\*.cshtml;Themes\**\*.json" />
-    <None Include="Themes\**"  CopyToPublishDirectory="PreserveNewest" />
+    <None Include="Themes\**" CopyToPublishDirectory="PreserveNewest" />
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
@@ -61,6 +62,13 @@
 
   <ItemGroup>
     <Folder Include="Plugins\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <!-- This target execute after "Build" target.

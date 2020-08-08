@@ -11,13 +11,18 @@
     <PackageProjectUrl>https://www.nopcommerce.com/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/nopSolutions/nopCommerce</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentMigrator" Version="3.2.6" />
-    <PackageReference Include="FluentMigrator.Runner" Version="3.2.6" />
+    <PackageReference Include="FluentMigrator" Version="3.2.8" />
+    <PackageReference Include="FluentMigrator.Runner" Version="3.2.8" />
     <PackageReference Include="linq2db" Version="2.9.8" />
-    <PackageReference Include="MySql.Data" Version="8.0.20" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MySql.Data" Version="8.0.21" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
   </ItemGroup>
 

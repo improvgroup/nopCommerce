@@ -1,28 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Nop.Core.Domain.Blogs;
-using Nop.Services.Blogs;
-using Nop.Services.Events;
-using Nop.Services.Localization;
-using Nop.Services.Logging;
-using Nop.Services.Messages;
-using Nop.Services.Security;
-using Nop.Services.Seo;
-using Nop.Services.Stores;
-using Nop.Web.Areas.Admin.Factories;
-using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
-using Nop.Web.Areas.Admin.Models.Blogs;
-using Nop.Web.Framework.Mvc;
-using Nop.Web.Framework.Mvc.Filters;
-
-namespace Nop.Web.Areas.Admin.Controllers
+﻿namespace Nop.Web.Areas.Admin.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.AspNetCore.Mvc;
+    using Nop.Core.Domain.Blogs;
+    using Nop.Services.Blogs;
+    using Nop.Services.Events;
+    using Nop.Services.Localization;
+    using Nop.Services.Logging;
+    using Nop.Services.Messages;
+    using Nop.Services.Security;
+    using Nop.Services.Seo;
+    using Nop.Services.Stores;
+    using Nop.Web.Areas.Admin.Factories;
+    using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
+    using Nop.Web.Areas.Admin.Models.Blogs;
+    using Nop.Web.Framework.Mvc;
+    using Nop.Web.Framework.Mvc.Filters;
+
     public partial class BlogController : BaseAdminController
     {
-        #region Fields
-
         private readonly IBlogModelFactory _blogModelFactory;
         private readonly IBlogService _blogService;
         private readonly ICustomerActivityService _customerActivityService;
@@ -33,10 +31,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IStoreMappingService _storeMappingService;
         private readonly IStoreService _storeService;
         private readonly IUrlRecordService _urlRecordService;
-
-        #endregion
-
-        #region Ctor
 
         public BlogController(IBlogModelFactory blogModelFactory,
             IBlogService blogService,
@@ -61,67 +55,49 @@ namespace Nop.Web.Areas.Admin.Controllers
             _urlRecordService = urlRecordService;
         }
 
-        #endregion
-
-        #region Utilities
-
-        protected virtual void SaveStoreMappings(BlogPost blogPost, BlogPostModel model)
-        {
-            blogPost.LimitedToStores = model.SelectedStoreIds.Any();
-            _blogService.UpdateBlogPost(blogPost);
-
-            var existingStoreMappings = _storeMappingService.GetStoreMappings(blogPost);
-            var allStores = _storeService.GetAllStores();
-            foreach (var store in allStores)
-            {
-                if (model.SelectedStoreIds.Contains(store.Id))
-                {
-                    //new store
-                    if (existingStoreMappings.Count(sm => sm.StoreId == store.Id) == 0)
-                        _storeMappingService.InsertStoreMapping(blogPost, store.Id);
-                }
-                else
-                {
-                    //remove store
-                    var storeMappingToDelete = existingStoreMappings.FirstOrDefault(sm => sm.StoreId == store.Id);
-                    if (storeMappingToDelete != null)
-                        _storeMappingService.DeleteStoreMapping(storeMappingToDelete);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Methods        
-
-        #region Blog posts
-
-        public virtual IActionResult Index()
-        {
-            return RedirectToAction("BlogPosts");
-        }
-
-        public virtual IActionResult BlogPosts(int? filterByBlogPostId)
+        [HttpPost]
+        public virtual IActionResult ApproveSelected(ICollection<int> selectedIds)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
                 return AccessDeniedView();
 
-            //prepare model
-            var model = _blogModelFactory.PrepareBlogContentModel(new BlogContentModel(), filterByBlogPostId);
+            if (selectedIds is null)
+                return Json(new { Result = true });
 
-            return View(model);
+            //filter not approved comments
+            var blogComments = _blogService.GetBlogCommentsByIds(selectedIds.ToArray()).Where(comment => !comment.IsApproved);
+
+            foreach (var blogComment in blogComments)
+            {
+                blogComment.IsApproved = true;
+
+                _blogService.UpdateBlogComment(blogComment);
+
+                //raise event
+                _eventPublisher.Publish(new BlogCommentApprovedEvent(blogComment));
+
+                //activity log
+                _customerActivityService.InsertActivity("EditBlogComment",
+                    string.Format(_localizationService.GetResource("ActivityLog.EditBlogComment"), blogComment.Id), blogComment);
+            }
+
+            return Json(new { Result = true });
         }
 
-        [HttpPost]
-        public virtual IActionResult List(BlogPostSearchModel searchModel)
+        public virtual IActionResult BlogComments(int? filterByBlogPostId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
-                return AccessDeniedDataTablesJson();
+                return AccessDeniedView();
+
+            //try to get a blog post with the specified id
+            var blogPost = _blogService.GetBlogPostById(filterByBlogPostId ?? 0);
+            if (blogPost is null && filterByBlogPostId.HasValue)
+                return RedirectToAction("BlogComments");
 
             //prepare model
-            var model = _blogModelFactory.PrepareBlogPostListModel(searchModel);
+            var model = _blogModelFactory.PrepareBlogCommentSearchModel(new BlogCommentSearchModel(), blogPost);
 
-            return Json(model);
+            return View(model);
         }
 
         public virtual IActionResult BlogPostCreate()
@@ -180,7 +156,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //try to get a blog post with the specified id
             var blogPost = _blogService.GetBlogPostById(id);
-            if (blogPost == null)
+            if (blogPost is null)
                 return RedirectToAction("BlogPosts");
 
             //prepare model
@@ -197,7 +173,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //try to get a blog post with the specified id
             var blogPost = _blogService.GetBlogPostById(model.Id);
-            if (blogPost == null)
+            if (blogPost is null)
                 return RedirectToAction("BlogPosts");
 
             if (ModelState.IsValid)
@@ -231,46 +207,33 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public virtual IActionResult Delete(int id)
+        public virtual IActionResult BlogPosts(int? filterByBlogPostId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
                 return AccessDeniedView();
-
-            //try to get a blog post with the specified id
-            var blogPost = _blogService.GetBlogPostById(id);
-            if (blogPost == null)
-                return RedirectToAction("BlogPosts");
-
-            _blogService.DeleteBlogPost(blogPost);
-
-            //activity log
-            _customerActivityService.InsertActivity("DeleteBlogPost",
-                string.Format(_localizationService.GetResource("ActivityLog.DeleteBlogPost"), blogPost.Id), blogPost);
-
-            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ContentManagement.Blog.BlogPosts.Deleted"));
-
-            return RedirectToAction("BlogPosts");
-        }
-
-        #endregion
-
-        #region Comments
-
-        public virtual IActionResult BlogComments(int? filterByBlogPostId)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
-                return AccessDeniedView();
-
-            //try to get a blog post with the specified id
-            var blogPost = _blogService.GetBlogPostById(filterByBlogPostId ?? 0);
-            if (blogPost == null && filterByBlogPostId.HasValue)
-                return RedirectToAction("BlogComments");
 
             //prepare model
-            var model = _blogModelFactory.PrepareBlogCommentSearchModel(new BlogCommentSearchModel(), blogPost);
+            var model = _blogModelFactory.PrepareBlogContentModel(new BlogContentModel(), filterByBlogPostId);
 
             return View(model);
+        }
+
+        public virtual IActionResult CommentDelete(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
+                return AccessDeniedView();
+
+            //try to get a blog comment with the specified id
+            var comment = _blogService.GetBlogCommentById(id)
+                ?? throw new ArgumentException("No comment found with the specified id", nameof(id));
+
+            _blogService.DeleteBlogComment(comment);
+
+            //activity log
+            _customerActivityService.InsertActivity("DeleteBlogPostComment",
+                string.Format(_localizationService.GetResource("ActivityLog.DeleteBlogPostComment"), comment.Id), comment);
+
+            return new NullJsonResult();
         }
 
         [HttpPost]
@@ -313,22 +276,26 @@ namespace Nop.Web.Areas.Admin.Controllers
             return new NullJsonResult();
         }
 
-        public virtual IActionResult CommentDelete(int id)
+        [HttpPost]
+        public virtual IActionResult Delete(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
                 return AccessDeniedView();
 
-            //try to get a blog comment with the specified id
-            var comment = _blogService.GetBlogCommentById(id)
-                ?? throw new ArgumentException("No comment found with the specified id", nameof(id));
+            //try to get a blog post with the specified id
+            var blogPost = _blogService.GetBlogPostById(id);
+            if (blogPost is null)
+                return RedirectToAction("BlogPosts");
 
-            _blogService.DeleteBlogComment(comment);
+            _blogService.DeleteBlogPost(blogPost);
 
             //activity log
-            _customerActivityService.InsertActivity("DeleteBlogPostComment",
-                string.Format(_localizationService.GetResource("ActivityLog.DeleteBlogPostComment"), comment.Id), comment);
+            _customerActivityService.InsertActivity("DeleteBlogPost",
+                string.Format(_localizationService.GetResource("ActivityLog.DeleteBlogPost"), blogPost.Id), blogPost);
 
-            return new NullJsonResult();
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ContentManagement.Blog.BlogPosts.Deleted"));
+
+            return RedirectToAction("BlogPosts");
         }
 
         [HttpPost]
@@ -337,7 +304,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
                 return AccessDeniedView();
 
-            if (selectedIds == null)
+            if (selectedIds is null)
                 return Json(new { Result = true });
 
             var comments = _blogService.GetBlogCommentsByIds(selectedIds.ToArray());
@@ -354,41 +321,12 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public virtual IActionResult ApproveSelected(ICollection<int> selectedIds)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
-                return AccessDeniedView();
-
-            if (selectedIds == null)
-                return Json(new { Result = true });
-
-            //filter not approved comments
-            var blogComments = _blogService.GetBlogCommentsByIds(selectedIds.ToArray()).Where(comment => !comment.IsApproved);
-
-            foreach (var blogComment in blogComments)
-            {
-                blogComment.IsApproved = true;
-
-                _blogService.UpdateBlogComment(blogComment);
-
-                //raise event 
-                _eventPublisher.Publish(new BlogCommentApprovedEvent(blogComment));
-
-                //activity log
-                _customerActivityService.InsertActivity("EditBlogComment",
-                    string.Format(_localizationService.GetResource("ActivityLog.EditBlogComment"), blogComment.Id), blogComment);
-            }
-
-            return Json(new { Result = true });
-        }
-
-        [HttpPost]
         public virtual IActionResult DisapproveSelected(ICollection<int> selectedIds)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
                 return AccessDeniedView();
 
-            if (selectedIds == null)
+            if (selectedIds is null)
                 return Json(new { Result = true });
 
             //filter approved comments
@@ -408,8 +346,46 @@ namespace Nop.Web.Areas.Admin.Controllers
             return Json(new { Result = true });
         }
 
-        #endregion
+        public virtual IActionResult Index()
+        {
+            return RedirectToAction("BlogPosts");
+        }
 
-        #endregion
+        [HttpPost]
+        public virtual IActionResult List(BlogPostSearchModel searchModel)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageBlog))
+                return AccessDeniedDataTablesJson();
+
+            //prepare model
+            var model = _blogModelFactory.PrepareBlogPostListModel(searchModel);
+
+            return Json(model);
+        }
+
+        protected virtual void SaveStoreMappings(BlogPost blogPost, BlogPostModel model)
+        {
+            blogPost.LimitedToStores = model.SelectedStoreIds.Any();
+            _blogService.UpdateBlogPost(blogPost);
+
+            var existingStoreMappings = _storeMappingService.GetStoreMappings(blogPost);
+            var allStores = _storeService.GetAllStores();
+            foreach (var store in allStores)
+            {
+                if (model.SelectedStoreIds.Contains(store.Id))
+                {
+                    //new store
+                    if (!existingStoreMappings.Any(sm => sm.StoreId == store.Id))
+                        _storeMappingService.InsertStoreMapping(blogPost, store.Id);
+                }
+                else
+                {
+                    //remove store
+                    var storeMappingToDelete = existingStoreMappings.FirstOrDefault(sm => sm.StoreId == store.Id);
+                    if (storeMappingToDelete != null)
+                        _storeMappingService.DeleteStoreMapping(storeMappingToDelete);
+                }
+            }
+        }
     }
 }

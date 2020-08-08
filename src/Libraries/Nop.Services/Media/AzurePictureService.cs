@@ -1,47 +1,44 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Nop.Core;
-using Nop.Core.Caching;
-using Nop.Core.Configuration;
-using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Media;
-using Nop.Core.Infrastructure;
-using Nop.Data;
-using Nop.Services.Caching;
-using Nop.Services.Catalog;
-using Nop.Services.Configuration;
-using Nop.Services.Events;
-using Nop.Services.Seo;
-
-namespace Nop.Services.Media
+﻿namespace Nop.Services.Media
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.IO;
+    using System.Threading.Tasks;
+    using Azure.Storage.Blobs;
+    using Azure.Storage.Blobs.Models;
+    using Microsoft.AspNetCore.Http;
+    using Nop.Core;
+    using Nop.Core.Caching;
+    using Nop.Core.Configuration;
+    using Nop.Core.Domain.Catalog;
+    using Nop.Core.Domain.Media;
+    using Nop.Core.Infrastructure;
+    using Nop.Data;
+    using Nop.Services.Caching;
+    using Nop.Services.Catalog;
+    using Nop.Services.Configuration;
+    using Nop.Services.Events;
+    using Nop.Services.Seo;
+
     /// <summary>
     /// Picture service for Windows Azure
     /// </summary>
     public partial class AzurePictureService : PictureService
     {
-        #region Fields
-
         private static bool _azureBlobStorageAppendContainerName;
-        private static bool _isInitialized;
-        private static CloudBlobContainer _container;
         private static string _azureBlobStorageConnectionString;
         private static string _azureBlobStorageContainerName;
         private static string _azureBlobStorageEndPoint;
+        private static BlobContainerClient _blobContainerClient;
+        private static BlobServiceClient _blobServiceClient;
+        private static bool _isInitialized;
         private readonly ICacheKeyService _cacheKeyService;
-        private readonly IStaticCacheManager _staticCacheManager;
-        private readonly MediaSettings _mediaSettings;
         private readonly object _locker = new object();
+        private readonly MediaSettings _mediaSettings;
+        private readonly IStaticCacheManager _staticCacheManager;
 
-        #endregion
-
-        #region Ctor
-
-        public AzurePictureService(INopDataProvider dataProvider,
+        public AzurePictureService(
+            INopDataProvider dataProvider,
             IDownloadService downloadService,
             ICacheKeyService cacheKeyService,
             IEventPublisher eventPublisher,
@@ -78,10 +75,6 @@ namespace Nop.Services.Media
             OneTimeInit(config);
         }
 
-        #endregion
-
-        #region Utilities
-
         protected void OneTimeInit(NopConfig config)
         {
             if (_isInitialized)
@@ -117,21 +110,15 @@ namespace Nop.Services.Media
         /// </summary>
         protected virtual async void CreateCloudBlobContainer()
         {
-            var storageAccount = CloudStorageAccount.Parse(_azureBlobStorageConnectionString);
-            if (storageAccount == null)
-                throw new Exception("Azure connection string for BLOB is not working");
-
-            //should we do it for each HTTP request?
-            var blobClient = storageAccount.CreateCloudBlobClient();
-
-            //GetContainerReference doesn't need to be async since it doesn't contact the server yet
-            _container = blobClient.GetContainerReference(_azureBlobStorageContainerName);
-
-            await _container.CreateIfNotExistsAsync();
-            await _container.SetPermissionsAsync(new BlobContainerPermissions
+            _blobServiceClient = new BlobServiceClient(_azureBlobStorageConnectionString);
+            if (_blobServiceClient is null)
             {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            });
+                throw new Exception("Azure connection string for BLOB is not working");
+            }
+
+            _blobContainerClient = _blobServiceClient.GetBlobContainerClient(_azureBlobStorageContainerName);
+
+            await _blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
         }
 
         /// <summary>
@@ -150,7 +137,7 @@ namespace Nop.Services.Media
         /// <returns>Local picture thumb path</returns>
         protected override string GetThumbLocalPath(string thumbFileName)
         {
-            var path = _azureBlobStorageAppendContainerName ? _azureBlobStorageContainerName + "/" : string.Empty;
+            var path = _azureBlobStorageAppendContainerName ? $"{_azureBlobStorageContainerName}/" : string.Empty;
 
             return $"{_azureBlobStorageEndPoint}/{path}{thumbFileName}";
         }
@@ -198,20 +185,21 @@ namespace Nop.Services.Media
             //create a string containing the blob name prefix
             var prefix = $"{picture.Id:0000000}";
 
-            BlobContinuationToken continuationToken = null;
-            do
+            var blobServiceClient = new BlobServiceClient(_azureBlobStorageConnectionString);
+            if (blobServiceClient is null)
             {
-                //get result segment
-                //listing snapshots is only supported in flat mode, so set the useFlatBlobListing parameter to true.
-                var resultSegment = await _container.ListBlobsSegmentedAsync(prefix, true, BlobListingDetails.All, null, continuationToken, null, null);
-
-                //delete files in result segment
-                await Task.WhenAll(resultSegment.Results.Select(blobItem => ((CloudBlockBlob)blobItem).DeleteAsync()));
-
-                //get the continuation token.
-                continuationToken = resultSegment.ContinuationToken;
+                throw new Exception("Azure connection string for BLOB is not working");
             }
-            while (continuationToken != null);
+
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(_azureBlobStorageContainerName);
+
+            var deletionQueue = new ConcurrentQueue<Task>();
+            await foreach (var blobItem in blobContainerClient.GetBlobsAsync(BlobTraits.All, BlobStates.All, prefix))
+            {
+                deletionQueue.Enqueue(blobContainerClient.DeleteBlobIfExistsAsync(blobItem.Name));
+            }
+
+            await Task.WhenAll(deletionQueue);
 
             _staticCacheManager.RemoveByPrefix(NopMediaDefaults.ThumbsExistsPrefixCacheKey);
         }
@@ -230,8 +218,7 @@ namespace Nop.Services.Media
 
                 return await _staticCacheManager.GetAsync(key, async () =>
                 {
-                    //GetBlockBlobReference doesn't need to be async since it doesn't contact the server yet
-                    var blockBlob = _container.GetBlockBlobReference(thumbFileName);
+                    var blockBlob = _blobContainerClient.GetBlobClient(thumbFileName);
 
                     return await blockBlob.ExistsAsync();
                 });
@@ -251,22 +238,33 @@ namespace Nop.Services.Media
         /// <param name="binary">Picture binary</param>
         protected virtual async Task SaveThumbAsync(string thumbFilePath, string thumbFileName, string mimeType, byte[] binary)
         {
-            //GetBlockBlobReference doesn't need to be async since it doesn't contact the server yet
-            var blockBlob = _container.GetBlockBlobReference(thumbFileName);
+            var blockBlob = _blobContainerClient.GetBlobClient(thumbFileName);
 
-            //set mime type
-            if (!string.IsNullOrEmpty(mimeType))
-                blockBlob.Properties.ContentType = mimeType;
+            if (!string.IsNullOrEmpty(mimeType) || !string.IsNullOrEmpty(_mediaSettings.AzureCacheControlHeader))
+            {
+                var blobHttpHeaders = new BlobHttpHeaders();
 
-            //set cache control
-            if (!string.IsNullOrEmpty(_mediaSettings.AzureCacheControlHeader))
-                blockBlob.Properties.CacheControl = _mediaSettings.AzureCacheControlHeader;
+                // set mime type
+                if (!string.IsNullOrEmpty(mimeType))
+                {
+                    blobHttpHeaders.ContentType = mimeType;
+                }
 
-            await blockBlob.UploadFromByteArrayAsync(binary, 0, binary.Length);
+                // set cache control
+                if (!string.IsNullOrEmpty(_mediaSettings.AzureCacheControlHeader))
+                {
+                    blobHttpHeaders.CacheControl = _mediaSettings.AzureCacheControlHeader;
+                }
+
+                await blockBlob.SetHttpHeadersAsync(blobHttpHeaders);
+            }
+
+            using (var ms = new MemoryStream(binary))
+            {
+                await blockBlob.UploadAsync(ms);
+            }
 
             _staticCacheManager.RemoveByPrefix(NopMediaDefaults.ThumbsExistsPrefixCacheKey);
         }
-
-        #endregion
     }
 }
