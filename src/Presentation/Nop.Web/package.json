@@ -37,7 +37,7 @@
     "jquery-tageditor": "^1.0.1",
     "jquery-ui-dist": "^1.13.2",
     "jquery-ui-touch-punch": "^0.2.3",
-    "jquery-validation": "^1.19.5",
+    "jquery-validation": "^1.21.0",
     "jquery-validation-unobtrusive": "^4.0.0",
     "jsrender": "1.0.16",
     "magnific-popup": "1.2.0",
