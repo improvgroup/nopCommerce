@@ -411,7 +411,41 @@ public class LocalizationMigration : MigrationBase
             "Account.Login.WrongCredentials.CustomerNotExist",
             "Account.Login.WrongCredentials.NotRegistered",
             "Account.PasswordRecovery.EmailHasBeenSent",
-            "Account.PasswordRecovery.EmailNotFound"
+            "Account.PasswordRecovery.EmailNotFound",
+
+            //#8093
+            "Admin.Configuration.Settings.CustomerSettings.PhoneNumberRegexValidationRule.Error",
+            "Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationRule",
+            "Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationRule.Hint",
+            "Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationUseRegex",
+            "Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationUseRegex.Hint",
+
+            //#8169
+            "Admin.Orders.Fields.CardCVV2",
+            "Admin.Orders.Fields.CardCVV2.Hint",
+            "Admin.Orders.Fields.CardExpirationMonth",
+            "Admin.Orders.Fields.CardExpirationMonth.Hint",
+            "Admin.Orders.Fields.CardExpirationYear",
+            "Admin.Orders.Fields.CardExpirationYear.Hint",
+            "Admin.Orders.Fields.CardName",
+            "Admin.Orders.Fields.CardName.Hint",
+            "Admin.Orders.Fields.CardNumber",
+            "Admin.Orders.Fields.CardNumber.Hint",
+            "Admin.Orders.Fields.CardType",
+            "Admin.Orders.Fields.CardType.Hint",
+            "Payment.CardCode",
+            "Payment.CardCode.Required",
+            "Payment.CardCode.Wrong",
+            "Payment.CardholderName",
+            "Payment.CardholderName.Required",
+            "Payment.CardNumber",
+            "Payment.CardNumber.Required",
+            "Payment.CardNumber.Wrong",
+            "Payment.ExpirationDate",
+            "Payment.ExpirationDate.Expired",
+            "Payment.ExpireMonth.Required",
+            "Payment.ExpireYear.Required",
+            "Payment.SelectCreditCard",
         });
 
         #endregion
@@ -656,7 +690,7 @@ public class LocalizationMigration : MigrationBase
             //customer info
             ["Account.CustomerInfo.VerifyPhoneNumber"] = "Verify phone number",
             ["Account.Fields.Phone.Status.NotVerified"] = "Phone number is not verified",
-            
+
             //#4279
             ["Admin.Catalog.Products.Multimedia.Object3d"] = "3D model",
             ["Admin.Catalog.Products.Multimedia.Object3d.Fields.FileName"] = "3D model file",
@@ -666,6 +700,8 @@ public class LocalizationMigration : MigrationBase
             ["Admin.Catalog.Products.Multimedia.Object3d.Fields.AltAttribute"] = "Alternative text",
             ["Admin.Catalog.Products.Multimedia.Object3d.Fields.AltAttribute.Hint"] = "The \"alt\" attribute for the \"model-viewer\" HTML element.",
             ["Admin.Catalog.Products.Multimedia.Object3d.Save"] = "Save",
+            ["Admin.Configuration.Settings.Vendor.AllowVendorsToUpload3dObjects"] = "Allow vendors to upload 3D models",
+            ["Admin.Configuration.Settings.Vendor.AllowVendorsToUpload3dObjects.Hint"] = "Check to allow vendors to upload product 3D models.",
 
             ["Admin.Configuration.Settings.Media.BlockTitle.Product3dObject"] = "Product 3D models",
             ["Admin.Configuration.Settings.Media.Object3dAutoRotateEnabled"] = "Auto-rotate",
@@ -749,6 +785,66 @@ public class LocalizationMigration : MigrationBase
             ["Enums.Nop.Core.Domain.PriceLists.PriceCalculationTypeEnum.AmountDecrease"] = "Amount decrease",
             ["Enums.Nop.Core.Domain.PriceLists.PriceCalculationTypeEnum.AmountIncrease"] = "Amount increase",
             ["Enums.Nop.Core.Domain.PriceLists.PriceCalculationTypeEnum.FixedPrice"] = "Fixed price",
+
+            //#8161
+            [$"Admin.ContentManagement.MessageTemplates.Description.{MessageTemplateSystemNames.RETURN_REQUEST_WITHDRAWAL_LINK_MESSAGE}"] = "This message template is used to send the withdrawal request confirmation.",
+            ["Account.CustomerOrders.WithdrawItems"] = "Withdraw contract",
+            ["Account.CustomerReturnRequests.Withdrawal.Title"] = "Withdrawal #{0} - {1}",
+            ["Account.CustomerReturnRequests.Withdrawals"] = "Withdrawals",
+            ["Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnWithdrawalForm"] = "Show on withdrawal form",
+            ["Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnWithdrawalForm.Hint"] = "Check to show CAPTCHA on withdrawal form.",
+            ["Admin.Configuration.Settings.Order.GuestReturnRequestsAllowed"] = "Allow guests to create return requests",
+            ["Admin.Configuration.Settings.Order.GuestReturnRequestsAllowed.Hint"] = "Check to allow guests to create return requests.",
+            ["Admin.Configuration.Settings.Order.ReturnActionsEnabled"] = "Return actions enabled",
+            ["Admin.Configuration.Settings.Order.ReturnActionsEnabled.Hint"] = "Check to enable return actions.",
+            ["Admin.Configuration.Settings.Order.ReturnReasonsEnabled"] = "Return reasons enabled",
+            ["Admin.Configuration.Settings.Order.ReturnReasonsEnabled.Hint"] = "Check to enable return reasons.",
+            ["Admin.Configuration.Settings.Order.ReturnRequestSettings"] = "Return request (withdrawal button) settings",
+            ["Admin.Configuration.Settings.Order.ReturnRequestsDescription.Withdrawal"] = "The same functionality can be used to support the EU Withdrawal button (EU Directive 2023/2673).",
+            ["Admin.Configuration.Settings.Order.UseEuWithdrawalLocales"] = "Locales for EU Withdrawal",
+            ["Admin.Configuration.Settings.Order.UseEuWithdrawalLocales.Hint"] = "Check to use locales for the EU withdrawal button (Directive 2023/2673). Otherwise, locales for \"return requests\" will be used.",
+            ["Admin.Configuration.Settings.Order.WithdrawalLinkDaysValid"] = "Withdrawal link. Days valid",
+            ["Admin.Configuration.Settings.Order.WithdrawalLinkDaysValid.Hint"] = "Enter the number of days the withdrawal link remains valid. Set to 0 for no expiration.",
+            ["Literals.Nop.Core.Http.NopRouteNames.General.WithdrawalRequestForm"] = "Withdraw contract",
+            ["Order.WithdrawItems"] = "Withdraw contract",
+            ["PageTitle.ReturnItems.Withdrawal"] = "Withdraw a contract",
+            ["PageTitle.ReturnRequests.WithdrawalForm"] = "Withdraw a contract",
+            ["ReturnRequests.Withdrawal.Fields.EmailAddress"] = "Email address",
+            ["ReturnRequests.Withdrawal.Fields.OrderNumber"] = "Order number",
+            ["ReturnRequests.Withdrawal.Submit"] = "Submit withdrawal request",
+            ["ReturnRequests.Withdrawal.Submitted"] = "Your withdrawal has been submitted successfully.",
+            ["ReturnRequests.Withdrawal.Title"] = "Withdraw contract for <a href=\"{0}\">order #{1}</a>",
+            ["ReturnRequests.WithdrawalForm"] = "Find your order",
+            ["ReturnRequests.WithdrawalForm.Submit"] = "Continue",
+            ["ReturnRequests.WithdrawalForm.ConfirnationText"] = "If your details are correct, we've sent you a link to continue.",
+            ["ReturnRequests.WithdrawalForm.EmailAddress.Required"] = "The Email address is required",
+            ["ReturnRequests.WithdrawalForm.OrderNumber.Required"] = "The Order number is required",
+
+            //#309
+            ["Admin.Configuration.Settings.Order.NextRecurringPaymentNotificationDays"] = "Next Recurring Payment Notification Days",
+            ["Admin.Configuration.Settings.Order.NextRecurringPaymentNotificationDays.Hint"] = "Number of days before the next recurring payment when customers should receive a notification email. Set to 0 to disable this notification.",
+
+            //#8093
+            ["Admin.Address.Fields.PhoneNumber.NotValid"] = "Phone number is not valid.",
+            ["Admin.Customers.Customers.Fields.Phone.NotValid"] = "Phone number is not valid.",
+
+            //#3456
+            ["Admin.Configuration.Settings.Order.ReturnRequestsForCompletedOrdersOnly"] = "Allow return requests only for completed orders",
+            ["Admin.Configuration.Settings.Order.ReturnRequestsForCompletedOrdersOnly.Hint"] = "Check this option to allow return requests only for completed orders.",
+
+            //#8229
+            ["Admin.Configuration.Settings.Order.DownloadableProductsReturnRequestsAllowed"] = "Allow return requests for downloadable products",
+            ["Admin.Configuration.Settings.Order.DownloadableProductsReturnRequestsAllowed.Hint"] = "Check this option to allow return requests for downloadable products.",
+
+            //#8247
+            ["Admin.Customers.Customers.Fields.PriceLists"] = "Price lists",
+            ["Admin.Customers.Customers.Fields.PriceLists.Hint"] = "Choose price lists of this user.",
+            ["Admin.Customers.Customers.Fields.PriceLists.NoPriceList"] = "No price lists available. Create at least one price list before mapping.",
+
+            //#8248
+            ["Admin.Catalog.Products.Fields.PriceLists"] = "Price lists",
+            ["Admin.Catalog.Products.Fields.PriceLists.Hint"] = "Choose price lists of this product.",
+            ["Admin.Catalog.Products.Fields.PriceLists.NoPriceList"] = "No price lists available. Create at least one price list before mapping.",
         });
 
         #endregion

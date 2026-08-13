@@ -48,6 +48,18 @@ public static partial class NopOrderDefaults
 
     #endregion
 
+    #region Wishlist
+
+    /// <summary>
+    /// Gets a key for caching
+    /// </summary>
+    /// <remarks>
+    /// {0} : customer ID
+    /// </remarks>
+    public static CacheKey CustomWishlistCacheKey => new("Nop.customwishlist.{0}");
+
+    #endregion
+
     #region Perform order with lock
 
     /// <summary>
@@ -59,6 +71,20 @@ public static partial class NopOrderDefaults
     public static CacheKey OrderWithLockCacheKey => new("Nop.Order.With.Lock.{0}");
 
     #endregion
+
+    #endregion
+
+    #region Return requests
+
+    /// <summary>
+    /// Gets a name of generic attribute to store the value of 'WithdrawalToken'
+    /// </summary>
+    public static string WithdrawalTokenAttribute => "WithdrawalToken";
+
+    /// <summary>
+    /// Gets a name of generic attribute to store the value of 'WithdrawalTokenDateGenerated'
+    /// </summary>
+    public static string WithdrawalTokenDateGeneratedAttribute => "WithdrawalTokenDateGenerated";
 
     #endregion
 }

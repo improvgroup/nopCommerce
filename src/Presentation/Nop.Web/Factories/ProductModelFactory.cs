@@ -14,6 +14,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Http;
+using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -248,8 +249,9 @@ public partial class ProductModelFactory : IProductModelFactory
             priceModel.PriceValue = finalPrice;
 
             //PAngV default baseprice (used in Germany)
-            priceModel.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceBase);
-            priceModel.BasePricePAngVValue = finalPriceBase;
+            var basePrice = await _productService.GetBaseProductPriceAsync(product, finalPrice);
+            priceModel.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, basePrice);
+            priceModel.BasePricePAngVValue = basePrice;
         }
     }
 
@@ -532,8 +534,9 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         //PAngV default base price (used in Germany)
-        model.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceWithDiscountBase);
-        model.BasePricePAngVValue = finalPriceWithDiscountBase;
+        var basePrice = await _productService.GetBaseProductPriceAsync(product, finalPriceWithDiscount);
+        model.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, basePrice);
+        model.BasePricePAngVValue = basePrice;
 
         return model;
     }
@@ -781,21 +784,27 @@ public partial class ProductModelFactory : IProductModelFactory
     /// Prepare the product to wishlist model
     /// </summary>
     /// <param name="product">Product</param>
+    /// <param name="currentWishlists">The current customer's custom wishlists; set to null to load them automatically</param>
     /// <returns>
     /// A task that represents the asynchronous operation
     /// The task result contains the product add to wishlist model
     /// </returns>
-    protected virtual async Task<ProductToWishlistModel> PrepareProductToWishlistModelAsync(Product product)
+    protected virtual async Task<ProductToWishlistModel> PrepareProductToWishlistModelAsync(Product product, IList<CustomWishlist> currentWishlists = null)
     {
         ArgumentNullException.ThrowIfNull(product);
+
+        //load current customer's custom wishlists if not passed
+        if (currentWishlists == null)
+        {
+            var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+            currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(currentCustomer.Id);
+        }
 
         var model = new ProductToWishlistModel
         {
             ProductId = product.Id
         };
-        //custom wishlists
-        var currentCustomer = await _workContext.GetCurrentCustomerAsync();
-        var currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(currentCustomer.Id);
+
         foreach (var wishlist in currentWishlists)
         {
             var customWishlistModel = new CustomWishlistModel
@@ -805,9 +814,10 @@ public partial class ProductModelFactory : IProductModelFactory
             };
             model.CustomWishlistItems.Add(customWishlistModel);
         }
+
         return model;
     }
-
+    
     /// <summary>
     /// Prepare the product add to cart model
     /// </summary>
@@ -1382,6 +1392,11 @@ public partial class ProductModelFactory : IProductModelFactory
         ArgumentNullException.ThrowIfNull(products);
 
         var models = new List<ProductOverviewModel>();
+
+        //load the current customer's wishlists once; the list is the same for every product on the page
+        var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+        var currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(currentCustomer.Id);
+
         foreach (var product in products)
         {
             var model = new ProductOverviewModel
@@ -1414,7 +1429,7 @@ public partial class ProductModelFactory : IProductModelFactory
             model.ReviewOverviewModel = await PrepareProductReviewOverviewModelAsync(product);
 
             //custom wishlist items
-            model.ProductToWishlist = await PrepareProductToWishlistModelAsync(product);
+            model.ProductToWishlist = await PrepareProductToWishlistModelAsync(product, currentWishlists);
 
             models.Add(model);
         }

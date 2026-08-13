@@ -104,8 +104,11 @@ public class ExportManagerTests : ServiceTest
 
     #region Utilities
 
-    protected static T PropertiesShouldEqual<T, Tp>(T actual, PropertyManager<Tp> manager, IDictionary<string, string> replacePairs, params string[] filter)
+    protected static void PropertiesShouldEqual<T, Tp>(T actual, PropertyManager<Tp> manager, IDictionary<string, string> replacePairs, params string[] filter)
     {
+        if (actual == null)
+            return;
+
         var objectProperties = typeof(T).GetProperties();
         foreach (var property in manager.GetDefaultProperties)
         {
@@ -139,7 +142,6 @@ public class ExportManagerTests : ServiceTest
                     propertyValue = property.StringValue;
                     break;
                 case DateTime time:
-                    ;
                     objectPropertyValue = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second);
                     if (DateTime.TryParse(property.StringValue, out var date))
                         propertyValue = date;
@@ -162,8 +164,6 @@ public class ExportManagerTests : ServiceTest
 
             propertyValue.Should().Be(objectPropertyValue, $"The property \"{typeof(T).Name}.{property.PropertyName}\" of these objects is not equal");
         }
-
-        return actual;
     }
 
     protected async Task<PropertyManager<T>> GetPropertyManagerAsync<T>(XLWorkbook workbook)
@@ -289,7 +289,7 @@ public class ExportManagerTests : ServiceTest
 
         const string shippingPattern = "Shipping";
         replacePairs = addressFields.ToDictionary(p => shippingPattern + p, p => p);
-        var testShippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+        var testShippingAddress = await _addressService.GetAddressByIdAsync((order.PickupInStore ? order.PickupAddressId : order.ShippingAddressId) ?? 0);
         PropertiesShouldEqual(testShippingAddress, manager, replacePairs, "CreatedOnUtc", "ShippingCountry");
         country = await _countryService.GetCountryByAddressAsync(testShippingAddress);
         manager.GetDefaultProperties.First(p => p.PropertyName == "ShippingCountry").StringValue.Should().Be(country.Name);

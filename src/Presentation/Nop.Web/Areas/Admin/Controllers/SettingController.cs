@@ -331,6 +331,7 @@ public partial class SettingController : BaseAdminController
             await _settingService.SaveSettingOverridablePerStoreAsync(vendorSettings, x => x.NotifyStoreOwnerAboutVendorInformationChange, model.NotifyStoreOwnerAboutVendorInformationChange_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(vendorSettings, x => x.MaximumProductNumber, model.MaximumProductNumber_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(vendorSettings, x => x.AllowVendorsToImportProducts, model.AllowVendorsToImportProducts_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(vendorSettings, x => x.AllowVendorsToUpload3dObjects, model.AllowVendorsToUpload3dObjects_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             await _settingService.ClearCacheAsync();
@@ -968,10 +969,6 @@ public partial class SettingController : BaseAdminController
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AttachPdfInvoiceToOrderPaidEmail, model.AttachPdfInvoiceToOrderPaidEmail_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AttachPdfInvoiceToOrderProcessingEmail, model.AttachPdfInvoiceToOrderProcessingEmail_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AttachPdfInvoiceToOrderCompletedEmail, model.AttachPdfInvoiceToOrderCompletedEmail_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.ReturnRequestsEnabled, model.ReturnRequestsEnabled_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.ReturnRequestsAllowFiles, model.ReturnRequestsAllowFiles_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.ReturnRequestNumberMask, model.ReturnRequestNumberMask_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.NumberOfDaysReturnRequestAvailable, model.NumberOfDaysReturnRequestAvailable_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.CustomOrderNumberMask, model.CustomOrderNumberMask_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.ExportWithProducts, model.ExportWithProducts_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AllowAdminsToBuyCallForPriceProducts, model.AllowAdminsToBuyCallForPriceProducts_OverrideForStore, storeScope, false);
@@ -982,10 +979,27 @@ public partial class SettingController : BaseAdminController
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AutoCancelDelay, model.AutoCancelDelay_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AutoCancelIgnoredPaymentMethods, model.AutoCancelIgnoredPaymentMethods_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(orderSettings, x => x.AutoCancelRestoreShoppingCart, model.AutoCancelRestoreShoppingCart_OverrideForStore, storeScope, false);
+
             await _settingService.SaveSettingAsync(orderSettings, x => x.ActivateGiftCardsAfterCompletingOrder, 0, false);
             await _settingService.SaveSettingAsync(orderSettings, x => x.DeactivateGiftCardsAfterCancellingOrder, 0, false);
             await _settingService.SaveSettingAsync(orderSettings, x => x.DeactivateGiftCardsAfterDeletingOrder, 0, false);
             await _settingService.SaveSettingAsync(orderSettings, x => x.CompleteOrderWhenDelivered, 0, false);
+
+
+            var returnRequestSettings = await _settingService.LoadSettingAsync<ReturnRequestSettings>(storeScope);
+            returnRequestSettings = model.ReturnRequestSettings.ToSettings(returnRequestSettings);
+
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnRequestsEnabled, model.ReturnRequestSettings.ReturnRequestsEnabled_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnRequestsAllowFiles, model.ReturnRequestSettings.ReturnRequestsAllowFiles_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnRequestNumberMask, model.ReturnRequestSettings.ReturnRequestNumberMask_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.NumberOfDaysReturnRequestAvailable, model.ReturnRequestSettings.NumberOfDaysReturnRequestAvailable_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.UseEuWithdrawalLocales, model.ReturnRequestSettings.UseEuWithdrawalLocales_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.GuestReturnRequestsAllowed, model.ReturnRequestSettings.GuestReturnRequestsAllowed_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.WithdrawalLinkDaysValid, model.ReturnRequestSettings.WithdrawalLinkDaysValid_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnReasonsEnabled, model.ReturnRequestSettings.ReturnReasonsEnabled_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnActionsEnabled, model.ReturnRequestSettings.ReturnActionsEnabled_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.ReturnRequestsForCompletedOrdersOnly, model.ReturnRequestSettings.ReturnRequestsForCompletedOrdersOnly_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(returnRequestSettings, x => x.DownloadableProductsReturnRequestsAllowed, model.ReturnRequestSettings.DownloadableProductsReturnRequestsAllowed_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             await _settingService.ClearCacheAsync();
@@ -1226,11 +1240,6 @@ public partial class SettingController : BaseAdminController
             var lastUsernameValidationEnabledValue = customerSettings.UsernameValidationEnabled;
             var lastUsernameValidationUseRegexValue = customerSettings.UsernameValidationUseRegex;
 
-            //Phone number validation settings
-            var lastPhoneNumberValidationRule = customerSettings.PhoneNumberValidationRule;
-            var lastPhoneNumberValidationEnabledValue = customerSettings.PhoneNumberValidationEnabled;
-            var lastPhoneNumberValidationUseRegexValue = customerSettings.PhoneNumberValidationUseRegex;
-
             var addressSettings = await _settingService.LoadSettingAsync<AddressSettings>(storeScope);
             var dateTimeSettings = await _settingService.LoadSettingAsync<DateTimeSettings>(storeScope);
             var externalAuthenticationSettings = await _settingService.LoadSettingAsync<ExternalAuthenticationSettings>(storeScope);
@@ -1271,24 +1280,6 @@ public partial class SettingController : BaseAdminController
                     customerSettings.UsernameValidationUseRegex = lastUsernameValidationUseRegexValue;
 
                     _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.CustomerSettings.RegexValidationRule.Error"));
-                }
-            }
-
-            if (customerSettings.PhoneNumberValidationEnabled && customerSettings.PhoneNumberValidationUseRegex)
-            {
-                try
-                {
-                    //validate regex rule
-                    var unused = Regex.IsMatch("123456789", customerSettings.PhoneNumberValidationRule);
-                }
-                catch (ArgumentException)
-                {
-                    //restoring previous settings
-                    customerSettings.PhoneNumberValidationRule = lastPhoneNumberValidationRule;
-                    customerSettings.PhoneNumberValidationEnabled = lastPhoneNumberValidationEnabledValue;
-                    customerSettings.PhoneNumberValidationUseRegex = lastPhoneNumberValidationUseRegexValue;
-
-                    _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.CustomerSettings.PhoneNumberRegexValidationRule.Error"));
                 }
             }
 
@@ -1660,6 +1651,7 @@ public partial class SettingController : BaseAdminController
             captchaSettings.ShowOnApplyVendorPage = model.CaptchaSettings.ShowOnApplyVendorPage;
             captchaSettings.ShowOnCheckoutPageForGuests = model.CaptchaSettings.ShowOnCheckoutPageForGuests;
             captchaSettings.ShowOnCheckGiftCardBalance = model.CaptchaSettings.ShowOnCheckGiftCardBalance;
+            captchaSettings.ShowOnWithdrawalForm = model.CaptchaSettings.ShowOnWithdrawalForm;
             captchaSettings.ReCaptchaPublicKey = model.CaptchaSettings.ReCaptchaPublicKey;
             captchaSettings.ReCaptchaPrivateKey = model.CaptchaSettings.ReCaptchaPrivateKey;
             captchaSettings.CaptchaType = (CaptchaType)model.CaptchaSettings.CaptchaType;
@@ -1681,6 +1673,7 @@ public partial class SettingController : BaseAdminController
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ShowOnForgotPasswordPage, model.CaptchaSettings.ShowOnForgotPasswordPage_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ShowOnCheckoutPageForGuests, model.CaptchaSettings.ShowOnCheckoutPageForGuests_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ShowOnCheckGiftCardBalance, model.CaptchaSettings.ShowOnCheckGiftCardBalance_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ShowOnWithdrawalForm, model.CaptchaSettings.ShowOnWithdrawalForm_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ReCaptchaPublicKey, model.CaptchaSettings.ReCaptchaPublicKey_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ReCaptchaPrivateKey, model.CaptchaSettings.ReCaptchaPrivateKey_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(captchaSettings, x => x.ReCaptchaV3ScoreThreshold, model.CaptchaSettings.ReCaptchaV3ScoreThreshold_OverrideForStore, storeScope, false);
@@ -1788,36 +1781,6 @@ public partial class SettingController : BaseAdminController
             var oldEncryptionPrivateKey = securitySettings.EncryptionKey;
             if (oldEncryptionPrivateKey == newEncryptionPrivateKey)
                 throw new NopException(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.GeneralCommon.EncryptionKey.TheSame"));
-
-            //update encrypted order info
-            var orders = await _orderService.SearchOrdersAsync();
-            foreach (var order in orders)
-            {
-                var decryptedCardType = _encryptionService.DecryptText(order.CardType, oldEncryptionPrivateKey);
-                var decryptedCardName = _encryptionService.DecryptText(order.CardName, oldEncryptionPrivateKey);
-                var decryptedCardNumber = _encryptionService.DecryptText(order.CardNumber, oldEncryptionPrivateKey);
-                var decryptedMaskedCreditCardNumber = _encryptionService.DecryptText(order.MaskedCreditCardNumber, oldEncryptionPrivateKey);
-                var decryptedCardCvv2 = _encryptionService.DecryptText(order.CardCvv2, oldEncryptionPrivateKey);
-                var decryptedCardExpirationMonth = _encryptionService.DecryptText(order.CardExpirationMonth, oldEncryptionPrivateKey);
-                var decryptedCardExpirationYear = _encryptionService.DecryptText(order.CardExpirationYear, oldEncryptionPrivateKey);
-
-                var encryptedCardType = _encryptionService.EncryptText(decryptedCardType, newEncryptionPrivateKey);
-                var encryptedCardName = _encryptionService.EncryptText(decryptedCardName, newEncryptionPrivateKey);
-                var encryptedCardNumber = _encryptionService.EncryptText(decryptedCardNumber, newEncryptionPrivateKey);
-                var encryptedMaskedCreditCardNumber = _encryptionService.EncryptText(decryptedMaskedCreditCardNumber, newEncryptionPrivateKey);
-                var encryptedCardCvv2 = _encryptionService.EncryptText(decryptedCardCvv2, newEncryptionPrivateKey);
-                var encryptedCardExpirationMonth = _encryptionService.EncryptText(decryptedCardExpirationMonth, newEncryptionPrivateKey);
-                var encryptedCardExpirationYear = _encryptionService.EncryptText(decryptedCardExpirationYear, newEncryptionPrivateKey);
-
-                order.CardType = encryptedCardType;
-                order.CardName = encryptedCardName;
-                order.CardNumber = encryptedCardNumber;
-                order.MaskedCreditCardNumber = encryptedMaskedCreditCardNumber;
-                order.CardCvv2 = encryptedCardCvv2;
-                order.CardExpirationMonth = encryptedCardExpirationMonth;
-                order.CardExpirationYear = encryptedCardExpirationYear;
-                await _orderService.UpdateOrderAsync(order);
-            }
 
             //update password information
             //optimization - load only passwords with PasswordFormat.Encrypted

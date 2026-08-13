@@ -216,6 +216,9 @@
   <LocaleResource Name="Account.CustomerOrders.ReturnItems">
     <Value>Return Item(s)</Value>
   </LocaleResource>
+  <LocaleResource Name="Account.CustomerOrders.WithdrawItems">
+    <Value>Withdraw contract</Value>
+  </LocaleResource>
   <LocaleResource Name="Account.CustomerProductReviews">
     <Value>My product reviews</Value>
   </LocaleResource>
@@ -257,6 +260,12 @@
   </LocaleResource>
   <LocaleResource Name="Account.CustomerReturnRequests.UploadedFile.Download">
     <Value>Download</Value>
+  </LocaleResource>
+  <LocaleResource Name="Account.CustomerReturnRequests.Withdrawal.Title">
+    <Value>Withdrawal #{0} - {1}</Value>
+  </LocaleResource>
+  <LocaleResource Name="Account.CustomerReturnRequests.Withdrawals">
+    <Value>Withdrawals</Value>
   </LocaleResource>
   <LocaleResource Name="Account.CustomerRecurringPayments">
     <Value>Recurring payments</Value>
@@ -1559,6 +1568,9 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Address.Fields.PhoneNumber.Hint">
     <Value>Enter phone number.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Address.Fields.PhoneNumber.NotValid">
+    <Value>Phone number is not valid.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Address.Fields.PhoneNumber.Required">
     <Value>Phone number is required.</Value>
@@ -3647,6 +3659,12 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Catalog.Products.Fields.Price.Hint">
     <Value>The price of the product. You can manage currency by selecting Configuration &gt; Currencies.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.PriceLists">
+    <Value>Price lists</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.PriceLists.Hint">
+    <Value>Choose price lists for this product.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Catalog.Products.Fields.ProductAvailabilityRange">
     <Value>Product availability range</Value>
@@ -7140,9 +7158,6 @@
   <LocaleResource Name="Admin.Configuration.Settings.Catalog.UseAjaxCatalogProductsLoading.Hint">
     <Value>Check to load products asynchronously (applicable to 'paging', 'filtering', 'view modes') on catalog pages.</Value>
   </LocaleResource>
-  <LocaleResource Name="Admin.Configuration.Settings.CustomerSettings.PhoneNumberRegexValidationRule.Error">
-    <Value>The regular expression for phone number validation is incorrect</Value>
-  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.CustomerSettings.RegexValidationRule.Error">
     <Value>The regular expression for username validation is incorrect</Value>
   </LocaleResource>
@@ -7659,18 +7674,6 @@
   <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationEnabled.Hint">
     <Value>Check to enable phone number validation (when registering or changing on the "My Account" page)</Value>
   </LocaleResource>
-  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationRule">
-    <Value>Phone number validation rule</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationRule.Hint">
-    <Value>Set the validation rule for phone number. You can specify a list of allowed characters or a regular expression. If you use a regular expression check the "Use regex for phone number validation" setting.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationUseRegex">
-    <Value>Use regex for phone number validation</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneNumberValidationUseRegex.Hint">
-    <Value>Check to use a regular expression for phone number validation (when registering or changing on the "My Account" page)</Value>
-  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.PhoneRequired">
     <Value>'Phone number' required</Value>
   </LocaleResource>
@@ -8126,6 +8129,12 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnRegistrationPage.Hint">
     <Value>Check to show CAPTCHA on registration page.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnWithdrawalForm">
+    <Value>Show on withdrawal form</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnWithdrawalForm.Hint">
+    <Value>Check to show CAPTCHA on withdrawal form.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.CaptchaType">
     <Value>Type of reCAPTCHA</Value>
@@ -8921,11 +8930,23 @@
   <LocaleResource Name="Admin.Configuration.Settings.Order.DisplayPickupInStoreOnShippingMethodPage.Hint">
     <Value>Display "Pickup in store" options on "Shipping method" page; otherwise display on the "Shipping address" page.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.DownloadableProductsReturnRequestsAllowed">
+    <Value>Allow return requests for downloadable products</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.DownloadableProductsReturnRequestsAllowed.Hint">
+    <Value>Check this option to allow return requests for downloadable products.</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ExportWithProducts">
     <Value>Export orders with products</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ExportWithProducts.Hint">
     <Value>Check if orders should be exported with products.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.GuestReturnRequestsAllowed">
+    <Value>Allow guests to create return requests</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.GuestReturnRequestsAllowed.Hint">
+    <Value>Check to allow guests to create return requests.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.IsReOrderAllowed">
     <Value>Is re-order allowed</Value>
@@ -8951,6 +8972,12 @@
   <LocaleResource Name="Admin.Configuration.Settings.Order.MinOrderTotalAmount.Hint">
     <Value>Enter minimum order total amount.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.NextRecurringPaymentNotificationDays">
+  	<Value>Next Recurring Payment Notification Days</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.NextRecurringPaymentNotificationDays.Hint">
+  	<Value>Number of days before the next recurring payment when customers should receive a notification email. Set to 0 to disable this notification.</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.NumberOfDaysReturnRequestAvailable">
     <Value>Number of days that the return request is available</Value>
   </LocaleResource>
@@ -8974,6 +9001,18 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.OrderIdent.Hint">
     <Value>Set the order ID counter. This is useful if you want your orders to start at a certain number. This only affects orders created going forward. The value must be greater than the current maximum order ID.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnActionsEnabled">
+    <Value>Return actions enabled</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnActionsEnabled.Hint">
+    <Value>Check to enable return actions.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnReasonsEnabled">
+    <Value>Return reasons enabled</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnReasonsEnabled.Hint">
+    <Value>Check to enable return reasons.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestActions">
     <Value>Return request actions</Value>
@@ -9086,14 +9125,23 @@
   <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsDescription2">
     <Value>NOTE: This option is available for completed orders.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsDescription.Withdrawal">
+    <Value>The same functionality can be used to support the EU Withdrawal button (EU Directive 2023/2673).</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsEnabled">
     <Value>Enable Returns System</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsEnabled.Hint">
     <Value>Check if you want to allow customers to submit return requests for items they've previously purchased.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsForCompletedOrdersOnly">
+    <Value>Allow return requests only for completed orders</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestsForCompletedOrdersOnly.Hint">
+    <Value>Check this option to allow return requests only for completed orders.</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ReturnRequestSettings">
-    <Value>Return request settings</Value>
+    <Value>Return request (withdrawal button) settings</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.ShowProductThumbnailInOrderDetailsPage">
     <Value>Show product thumbnail in order details page</Value>
@@ -9113,11 +9161,23 @@
   <LocaleResource Name="Admin.Configuration.Settings.Order.TermsOfServiceOnShoppingCartPage.Hint">
     <Value>Require customers to accept or decline terms of service before processing the order (on the shopping cart page).</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.UseEuWithdrawalLocales">
+    <Value>Locales for EU Withdrawal</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.UseEuWithdrawalLocales.Hint">
+    <Value>Check to use locales for the EU withdrawal button (Directive 2023/2673). Otherwise, locales for "return requests" will be used.</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.Warning.TaskDisabled">
     <Value><![CDATA[Please remember <a href="{0}" target="_blank">to enable</a> the "{1}" scheduled task.]]></Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Order.Warning.NotFound">
     <Value>Auto-cancel unpaid orders task not found</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.WithdrawalLinkDaysValid">
+    <Value>Withdrawal link. Days valid</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Order.WithdrawalLinkDaysValid.Hint">
+    <Value>Enter the number of days the withdrawal link remains valid. Set to 0 for no expiration.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.ProductEditor.ACL">
     <Value>Customer roles</Value>
@@ -9970,6 +10030,12 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Vendor.AllowVendorsToImportProducts.Hint">
     <Value>Check if vendors are allowed to import products.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Vendor.AllowVendorsToUpload3dObjects">
+    <Value>Allow vendors to upload 3D models</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.Vendor.AllowVendorsToUpload3dObjects.Hint">
+    <Value>Check to allow vendors to upload product 3D models.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Configuration.Settings.Vendor.BlockTitle.Catalog">
     <Value>Catalog</Value>
@@ -11611,6 +11677,9 @@
   <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.Reminders.RegistrationFollowUp">
     <Value>This message template is used to send the follow-up #1 for a incomplete registration.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.ReturnRequest.WithdrawalLinkMessage">
+    <Value>This message template is used to send the withdrawal request confirmation.</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.QuantityBelow.AttributeCombination.StoreOwnerNotification">
     <Value>This message template is used to notify a store owner that the certain product attribute combination is getting low stock. You can set up the combination minimum quantity when creating or editing the product in Product attribute tab - Attributes combinations tab in Notify admin for quantity below field.</Value>
   </LocaleResource>
@@ -11634,6 +11703,9 @@
   </LocaleResource>
   <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.ReturnRequestStatusChanged.CustomerNotification">
     <Value>This message template is used to notify a customer that the request status to the certain order is changed. You can set up this option in Sales - Return requests by clicking "Notify customer about status change" button.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.ReturnRequest.WithdrawalLink">
+    <Value>This message template is used to send the withdrawal request confirmation.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.ContentManagement.MessageTemplates.Description.Service.ContactUs">
     <Value>This message template is used to notify a store owner about a message sent through the contact form.</Value>
@@ -12550,6 +12622,9 @@
   <LocaleResource Name="Admin.Customers.Customers.Fields.Phone.Hint">
     <Value>The phone.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Customers.Customers.Fields.Phone.NotValid">
+    <Value>Phone is not valid</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.Customers.Customers.Fields.Phone.Required">
     <Value>Phone is required</Value>
   </LocaleResource>
@@ -12558,6 +12633,15 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Customers.Customers.Fields.PhoneSmsVerified.Hint">
     <Value>Indicates whether the customer's phone number has been verified via SMS.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Customers.Customers.Fields.PriceLists">
+    <Value>Price lists</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Customers.Customers.Fields.PriceLists.Hint">
+    <Value>Choose price lists of this user.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Customers.Customers.Fields.PriceLists.NoPriceList">
+    <Value>No price lists available. Create at least one price list before mapping.</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Customers.Customers.Fields.RegisteredInStore">
     <Value>Registered in the store</Value>
@@ -13560,43 +13644,7 @@
   </LocaleResource>
   <LocaleResource Name="Admin.Orders.Fields.CaptureTransactionID.Hint">
     <Value>Capture transaction identifier received from your payment gateway.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardCVV2">
-    <Value>Card CVV2</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardCVV2.Hint">
-    <Value>The card security code of the card used in the transaction.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardExpirationMonth">
-    <Value>Card expiry month</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardExpirationMonth.Hint">
-    <Value>The expiry month of the card used in the transaction.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardExpirationYear">
-    <Value>Card expiry year</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardExpirationYear.Hint">
-    <Value>The expiry year of the card used in the transaction.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardName">
-    <Value>Card name</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardName.Hint">
-    <Value>The name on the card used in the transaction.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardNumber">
-    <Value>Card number</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardNumber.Hint">
-    <Value>The number of the card used in the transaction.</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardType">
-    <Value>Card type</Value>
-  </LocaleResource>
-  <LocaleResource Name="Admin.Orders.Fields.CardType.Hint">
-    <Value>The type of a card used in the transaction.</Value>
-  </LocaleResource>
+  </LocaleResource>  
   <LocaleResource Name="Admin.Orders.Fields.CreatedOn">
     <Value>Created on</Value>
   </LocaleResource>
@@ -18673,6 +18721,9 @@
   <LocaleResource Name="Literals.Nop.Core.Http.NopRouteNames.General.RecentlyViewedProducts">
     <Value>Recently viewed products</Value>
   </LocaleResource>
+  <LocaleResource Name="Literals.Nop.Core.Http.NopRouteNames.General.WithdrawalRequestForm">
+    <Value>Withdraw contract</Value>
+  </LocaleResource>
   <LocaleResource Name="Literals.Nop.Core.Http.NopRouteNames.General.NewProducts">
     <Value>New products</Value>
   </LocaleResource>
@@ -19087,6 +19138,9 @@
   <LocaleResource Name="Order.VATNumber">
     <Value>VAT number</Value>
   </LocaleResource>
+  <LocaleResource Name="Order.WithdrawItems">
+    <Value>Withdraw contract</Value>
+  </LocaleResource>
   <LocaleResource Name="Pager.CurrentPage">
     <Value>Page {0} of {1} ({2} total)</Value>
   </LocaleResource>
@@ -19207,6 +19261,12 @@
   <LocaleResource Name="PageTitle.ReturnItems">
     <Value>Return Item(s)</Value>
   </LocaleResource>
+  <LocaleResource Name="PageTitle.ReturnItems.Withdrawal">
+    <Value>Withdraw a contract</Value>
+  </LocaleResource>
+  <LocaleResource Name="PageTitle.ReturnRequests.WithdrawalForm">
+    <Value>Withdraw a contract</Value>
+  </LocaleResource>
   <LocaleResource Name="PageTitle.Search">
     <Value>Search</Value>
   </LocaleResource>
@@ -19245,46 +19305,7 @@
   </LocaleResource>
   <LocaleResource Name="PageTitle.WishlistEmailAFriend">
     <Value>Email wishlist to a friend</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardCode">
-    <Value>Card code</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardCode.Required">
-    <Value>Enter card code</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardCode.Wrong">
-    <Value>Wrong card code</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardholderName">
-    <Value>Cardholder name</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardholderName.Required">
-    <Value>Enter cardholder name</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardNumber">
-    <Value>Card number</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardNumber.Required">
-    <Value>Enter card number</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.CardNumber.Wrong">
-    <Value>Wrong card number</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.ExpirationDate">
-    <Value>Expiration date</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.ExpirationDate.Expired">
-    <Value>Card is expired</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.ExpireMonth.Required">
-    <Value>Expire month is required</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.ExpireYear.Required">
-    <Value>Expire year is required</Value>
-  </LocaleResource>
-  <LocaleResource Name="Payment.SelectCreditCard">
-    <Value>Select credit card</Value>
-  </LocaleResource>
+  </LocaleResource>  
   <LocaleResource Name="PaymentMethod.NotAvailableMethodsError">
     <Value>Your order cannot be completed at this time as there is no payment methods available for it.</Value>
   </LocaleResource>
@@ -19956,6 +19977,36 @@
   </LocaleResource>
   <LocaleResource Name="ReturnRequests.WhyReturning">
     <Value>Why are you returning these items?</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.Withdrawal.Fields.EmailAddress">
+    <Value>Email address</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.Withdrawal.Fields.OrderNumber">
+    <Value>Order number</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.Withdrawal.Submit">
+    <Value>Submit withdrawal request</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.Withdrawal.Submitted">
+    <Value>Your withdrawal has been submitted successfully.</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.Withdrawal.Title">
+    <Value><![CDATA[Withdraw contract for <a href=\"{0}\">order #{1}</a>]]></Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.WithdrawalForm">
+    <Value>Find your order</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.WithdrawalForm.ConfirnationText">
+    <Value>If your details are correct, we've sent you a link to continue.</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.WithdrawalForm.EmailAddress.Required">
+    <Value>The Email address is required</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.WithdrawalForm.OrderNumber.Required">
+    <Value>The Order number is required</Value>
+  </LocaleResource>
+  <LocaleResource Name="ReturnRequests.WithdrawalForm.Submit">
+    <Value>Continue</Value>
   </LocaleResource>
   <LocaleResource Name="Reviews">
     <Value>Reviews</Value>
